@@ -7,10 +7,20 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
-
+/**
+ * Manages the JDBC connection to the database for the Flipkart system.
+ * This class is responsible for establishing and maintaining a connection to a MySQL database,
+ * ensuring that all database operations are performed over a valid and active connection.
+ */
 public class JDBCConnection {
     private static Connection connection = null;
 
+    /**
+     * Gets the active database connection. If the current connection is not valid, it attempts to establish a new one.
+     * Uses default database credentials and settings to establish this connection.
+     *
+     * @return An active {@link Connection} object.
+     */
     public static Connection getConnection() {
         try {
             if (isValid()) {
@@ -18,18 +28,10 @@ public class JDBCConnection {
             } else {
                 try {
                     Properties prop = new Properties();
-//                    commented out the below code because, maven is not able to find config file
-
-//                    InputStream inputStream = JDBCConnection.class.getClassLoader().getResourceAsStream("./config.properties");
-//                    prop.load(inputStream);
-//                    String driver = prop.getProperty("driver");
-//                    String url = prop.getProperty("url");
-//                    String user = prop.getProperty("user");
-//                    String password = prop.getProperty("password");
                     String driver = "com.mysql.cj.jdbc.Driver";
-                    String url = "jdbc:mysql://127.0.0.1:3306/flipfit_Schema_G";
+                    String url = "jdbc:mysql://127.0.0.1:3306/flipfit";
                     String user = "root";
-                    String password = "Ananya12345!" ;
+                    String password = "Fk!@#%215046" ;
                     Class.forName(driver);
                     connection = DriverManager.getConnection(url, user, password);
                     System.out.println("Connected to database");
@@ -38,13 +40,6 @@ public class JDBCConnection {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-
-
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -52,6 +47,13 @@ public class JDBCConnection {
         }
         return connection;
     }
+
+    /**
+     * Checks if the current database connection is valid and open.
+     *
+     * @return true if the connection is valid and open, false otherwise.
+     * @throws SQLException if a database access error occurs.
+     */
     public static boolean isValid() throws SQLException {
         return connection != null && !connection.isClosed();
     }

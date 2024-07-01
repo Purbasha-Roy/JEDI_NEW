@@ -2,8 +2,8 @@ package com.flipkart.dao;
 
 import com.flipkart.bean.Gym;
 import com.flipkart.bean.GymOwner;
+import com.flipkart.bean.User;
 import com.flipkart.constants.SQLConstants;
-import com.flipkart.exception.VerificationFailedException;
 import com.flipkart.utils.JDBCConnection;
 
 import java.sql.Connection;
@@ -13,173 +13,138 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementation of the AdminDAOInterface for performing CRUD operations related to gyms, gym owners, and users.
+ */
 public class AdminDAOImplementation implements AdminDAOInterface {
     JDBCConnection connector;
     Connection conn;
 
+    /**
+     * Retrieves a list of all gyms from the database.
+     * @return a list of Gym objects
+     */
     @Override
-    public void viewGyms() {
-        Connection conn = null;
-        PreparedStatement preparedStatement = null;
-        try {
-            conn = JDBCConnection.getConnection();
-            String sqlQuery = SQLConstants.ADMIN_VIEW_ALL_GYMS;
-            preparedStatement = conn.prepareStatement(sqlQuery);
-            ResultSet resultSet = preparedStatement.executeQuery();
+    public List<Gym> viewGyms() {
+        List<Gym> gyms = new ArrayList<>();
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(SQLConstants.ADMIN_VIEW_ALL_GYMS);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
-                int id = resultSet.getInt("gymId");
-                String ownerId = resultSet.getString("ownerId");
-                String name = resultSet.getString("gymName");
-                String gymAddress = resultSet.getString("gymAddress");
-                String location = resultSet.getString("location");
-                String status = resultSet.getString("status");
-
-                // Print the data or perform any other operations you need
-                System.out.println("Gym ID: " + id);
-                System.out.println("Name: " + name);
-                System.out.println("Owner Id : " + ownerId);
-                System.out.println("Gym Address : " + gymAddress);
-                System.out.println("Gym Location : " + location);
-                System.out.println("Status of Gym(verified or not) : " + status);
-                System.out.println("---------------------------------");
+                Gym gym = new Gym();
+                gym.setGymId(resultSet.getInt("gymId"));
+                gym.setOwnerId(resultSet.getString("ownerId"));
+                gym.setGymName(resultSet.getString("gymName"));
+                gym.setGymAddress(resultSet.getString("gymAddress"));
+                gym.setLocation(resultSet.getString("location"));
+                gym.setStatus(resultSet.getString("status"));
+                gyms.add(gym);
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
+        return gyms;
     }
 
+    /**
+     * Retrieves a list of all users from the database.
+     * @return a list of User objects
+     */
     @Override
-    public void viewUsers() {
-        Connection conn = null;
-        PreparedStatement preparedStatement = null;
-        try {
-            conn = JDBCConnection.getConnection();
-//            System.out.println("Debug3");
-            preparedStatement = conn.prepareStatement(SQLConstants.ADMIN_VIEW_ALL_USERS);
+    public List<User> viewUsers() {
+        List<User> users = new ArrayList<>();
+        String sqlQuery = SQLConstants.ADMIN_VIEW_ALL_USERS;
 
-            ResultSet resultSet = preparedStatement.executeQuery();
-            System.out.println("Debug");
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(sqlQuery);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
-                int id = resultSet.getInt("userId");
-                String phoneNo = resultSet.getString("phoneNumber");
-                String name = resultSet.getString("userName");
-                String address = resultSet.getString("Address");
-                String loc = resultSet.getString("location");
-                String email = resultSet.getString("email");
+                User user = new User();
+                user.setuserId(resultSet.getInt("userId"));
+                user.setPhoneNumber(resultSet.getString("phoneNumber"));
+                user.setUserName(resultSet.getString("userName"));
+                user.setAddress(resultSet.getString("Address"));
+                user.setLocation(resultSet.getString("location"));
+                user.setEmail(resultSet.getString("email"));
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error while fetching user data: " + e.getMessage());
+        }
+        return users;
+    }
 
-                // Print the data or perform any other operations you need
-                System.out.println("User ID: " + id);
-                System.out.println("Name: " + name);
-                System.out.println("Phone No : " + phoneNo);
-                System.out.println("Address : " + address);
-                System.out.println("Email Id : " + email);
+    /**
+     * Retrieves a list of all gym owners from the database.
+     * @return a list of GymOwner objects
+     */
+    @Override
+    public List<GymOwner> viewGymOwners() {
+        List<GymOwner> gymOwners = new ArrayList<>();
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(SQLConstants.ADMIN_VIEW_ALL_GYMOWNERS);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
 
-                System.out.println("Location : " + loc);
-                System.out.println("---------------------------------");
+            while (resultSet.next()) {
+                GymOwner gymOwner = new GymOwner();
+                gymOwner.setOwnerId(resultSet.getInt("owner_id"));
+                gymOwner.setOwnerName(resultSet.getString("name"));
+                gymOwner.setOwnerEmail(resultSet.getString("email"));
+                gymOwner.setPhoneNo(resultSet.getString("phone_number"));
+                gymOwner.setNationalId(resultSet.getString("aadhar"));
+                gymOwner.setGST(resultSet.getString("pancard"));
+                gymOwner.setStatus(resultSet.getString("status"));
+                gymOwners.add(gymOwner);
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
+        return gymOwners;
     }
 
+    /**
+     * Retrieves a list of all gym owners from the database.
+     * @return a list of GymOwner objects
+     */
     @Override
-    public void viewGymOwners() {
-        Connection conn = null;
-        PreparedStatement preparedStatement = null;
-        try {
-
-            conn = JDBCConnection.getConnection();
-            System.out.println("Debug3");
-            preparedStatement = conn.prepareStatement(SQLConstants.ADMIN_VIEW_ALL_GYMOWNERS);
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                int id = resultSet.getInt("owner_id");
-                String phoneNo = resultSet.getString("phone_number");
-                String name = resultSet.getString("name");
-                String email = resultSet.getString("email");
-                String adhaar = resultSet.getString("aadhar");
-                String pan = resultSet.getString("pancard");
-                String statusGymOwner = resultSet.getString("status");
-
-                // Print the data or perform any other operations you need
-                System.out.println("Gym Owner ID: " + id);
-                System.out.println("Name: " + name);
-                System.out.println("Phone No : " + phoneNo);
-
-                System.out.println("Email Id : " + email);
-                System.out.println("Adhaar no : " + adhaar);
-                System.out.println("PAN Card Number : " + pan);
-                System.out.println("Status  of The Gym Owner : " + statusGymOwner);
-
-                System.out.println("---------------------------------");
-            }
+    public boolean verifyGymOwners(int id) {
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(SQLConstants.ADMIN_VERIFY_GYMOWNERS)) {
+            preparedStatement.setString(1, "verified");
+            preparedStatement.setInt(2, id);
+            int result = preparedStatement.executeUpdate();
+            return result > 0;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            return false;
         }
     }
 
+    /**
+     * Verifies the status of a gym based on its ID.
+     * @param id the ID of the gym to verify
+     * @return true if the status was successfully updated to 'verified', false otherwise
+     */
     @Override
-    public void verifyGymOwners(int id) {
-        // update the gymOwner db's status as verified.
-        conn = JDBCConnection.getConnection();
-        PreparedStatement preparedStatement = null;
-        try {
-            //TODO -> for each onwer, update their status as verified.
-            String query = SQLConstants.ADMIN_VERIFY_GYMOWNERS;
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            pstmt.setString(1, "verified");
-            pstmt.setString(2, Integer.toString(id));
-            int stats = pstmt.executeUpdate(); // execute update statement
-            //conn.commit();
-
-            if (stats > 0) {
-                System.out.println("Verified GymOwner successfully");
-            } else {
-                throw new VerificationFailedException();
-//                System.out.println("Gym Owner verification failed");
-            }
-
-            System.out.println("---------------------------------");
-
-        }catch(VerificationFailedException ex){
-            System.out.println("Gym Owner "+ex.getMessage());
-        }
-        catch (SQLException e) {
+    public boolean verifyGyms(int id) {
+        try (Connection conn = JDBCConnection.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement(SQLConstants.ADMIN_VERIFY_GYMS)) {
+            preparedStatement.setString(1, "verified");
+            preparedStatement.setInt(2, id);
+            int result = preparedStatement.executeUpdate();
+            return result > 0;
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
+            return false;
         }
     }
 
-    @Override
-    public void verifyGyms(int id) {
-        PreparedStatement preparedStatement = null;
-        conn = JDBCConnection.getConnection();
-        try {
-            String query = SQLConstants.ADMIN_VERIFY_GYMS;
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            pstmt.setString(1, "verified"); // set input parameter 1
-            pstmt.setString(2, Integer.toString(id)); // set input parameter 2
-            int stats = pstmt.executeUpdate(); // execute update statement
-            if (stats > 0) {
-                System.out.println("Verified Gym successfully");
-            } else {
-                throw new VerificationFailedException();
-//                System.out.println("Gym Owner verification failed");
-            }
-
-            System.out.println("---------------------------------");
-
-        }catch(VerificationFailedException ex){
-            System.out.println("Gym "+ex.getMessage());
-        }
-        catch (SQLException e) {
-            System.out.println(e.getMessage());;
-        }
-    }
-
+    /**
+     * Retrieves a list of all gyms that are currently marked as unverified.
+     * @return a list of unverified Gym objects
+     */
     @Override
     public List<Gym> getUnverifiedGyms() {
         conn = JDBCConnection.getConnection();
@@ -190,7 +155,7 @@ public class AdminDAOImplementation implements AdminDAOInterface {
         try {
             String sqlQuery = SQLConstants.ADMIN_VIEW_UNVERIFIED_GYMS;
             preparedStatement = conn.prepareStatement(sqlQuery);
-            preparedStatement.setString(1, "Unverified");
+            preparedStatement.setString(1, "Inactive");
             resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
@@ -215,6 +180,10 @@ public class AdminDAOImplementation implements AdminDAOInterface {
         return gyms;
     }
 
+    /**
+     * Retrieves a list of all gym owners that are currently marked as unverified.
+     * @return a list of unverified GymOwner objects
+     */
     @Override
     public List<GymOwner> getUnverifiedGymOwner() {
         conn = JDBCConnection.getConnection();
@@ -225,7 +194,7 @@ public class AdminDAOImplementation implements AdminDAOInterface {
         try {
             String sqlQuery = SQLConstants.ADMIN_VIEW_UNVERIFIED_GYMOWNER;
             preparedStatement = conn.prepareStatement(sqlQuery);
-            preparedStatement.setString(1, "Unverified");
+            preparedStatement.setString(1, "Inactive");
             resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
